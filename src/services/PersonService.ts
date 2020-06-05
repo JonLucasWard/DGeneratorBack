@@ -7,7 +7,7 @@ function ranDom(size:number) { //edit how big we want the value to be
     return num;
 }
 
-export async function getPerson(Criminal: boolean): Promise<Person> {
+export async function getPerson(Criminal: string): Promise<Person> {
     const ReturnPerson = new Person(); // We will pass userData into this
     
     var queryString = `select name, explanation from vice where id = $1`;//select the Name and Explanation columns from [variable table name] where id = [random number]
@@ -66,18 +66,19 @@ export async function getPerson(Criminal: boolean): Promise<Person> {
     Data = Result.rows[0];
     ReturnPerson.Occupation = Data.name; ReturnPerson.OccupationExplanation = Data.explanation;
 
-    
-    if(Criminal && ranDom(2)>1){ //if Criminal option is on and coin flip, it runs, else it doesn't
+    if((Criminal == "true") && (ranDom(2)>1)){ //if Criminal option is on and coin flip, it runs, else it doesn't
         queryString = `select name, explanation from crime where id = $1`;
         Result = await db.query(queryString, [ranDom(P.CrimeExplanations.length)]); 
         Data = Result.rows[0];
         ReturnPerson.Crime = Data.name; ReturnPerson.CrimeExplanation = Data.explanation;
         if(ranDom(2) > 1){ //another coin flip if they were caught or not
-            ReturnPerson.Caught = "Yes";
+            ReturnPerson.Caught = "and was caught.";
         }
         else{
-            ReturnPerson.Caught = "No";
+            ReturnPerson.Caught = "and was not caught.";
         }
+    } else {
+        ReturnPerson.Crime = "no"; ReturnPerson.Caught = "";
     }
     return ReturnPerson; // return the completed User object to be read
 }

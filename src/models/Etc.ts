@@ -180,6 +180,12 @@ export const RoomsNames =[
 'Prison Cells'
 ]
 
+export const BuildingNames =[
+    'Building1',
+    'Building2',
+    'Building3'
+]
+
 export class MagicItem{
     public Item:string; public ItemExplanation:string;
     public ItemAge:string; public ItemAgeExplanation:string;

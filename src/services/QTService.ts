@@ -1,6 +1,8 @@
 import db from '../util/pg-connector'; // To allow access to the database at all
 import {MagicItem} from '../models/Etc';
 import * as E from '../models/Etc';
+import {Event} from '../models/Events';
+import * as Events from '../models/Events';
 
 function ranDom(size:number) { //edit how big we want the value to be
     var num = Math.floor( (Math.random() * size) + 1); //round up a random number with a maximum size of "size" + 1 (1 is minimum and allows size to be maximum)
@@ -67,3 +69,45 @@ export async function getMagicItem(power:number, curses:string, curselevel:numbe
     return ReturnItem;
 }
 
+export async function getRoom(): Promise<String> {
+    var queryString = 'select name from Rooms where id = $1';
+    var Result = await db.query(queryString, [ranDom(E.RoomsNames.length)]);
+    var Room = Result.rows[0].name;
+    return Room;
+}
+
+export async function getBuilding(): Promise<String> {
+    var queryString = 'select name from Buildings where id = $1';
+    var Result = await db.query(queryString, [ranDom(E.BuildingNames.length)]);
+    var Building = Result.rows[0].name;
+    return Building;
+}
+
+export async function getEvent(type:string): Promise<Event>{
+    var queryString = `select name from ${type} where id = $1`;
+    var EffectsQuery = `select name, explanation from EventEffects where id = $1`;
+    var ReturnEvent = new Event();
+    switch(type){
+        case 'TownEvents':
+                var Result = await db.query(queryString, [ranDom(Events.RandTownEvent.length)]);
+                ReturnEvent.Event = Result.rows[0].name;
+                Result = await db.query(EffectsQuery, [ranDom(Events.RandEventEffectNames.length)]);
+                ReturnEvent.EventEffect = Result.rows[0].name; ReturnEvent.EventEffectExplanation = Result.rows[0].explanation;
+            break;
+        case 'TravelEvents':
+            var Result = await db.query(queryString, [ranDom(Events.RandTravelEvent.length)]);
+            ReturnEvent.Event = Result.rows[0].name;
+            Result = await db.query(EffectsQuery, [ranDom(Events.RandEventEffectNames.length)]);
+            ReturnEvent.EventEffect = Result.rows[0].name; ReturnEvent.EventEffectExplanation = Result.rows[0].explanation;
+            break;
+        case 'DungeonEvents':
+            var Result = await db.query(queryString, [ranDom(Events.RandDungeonEvent.length)]);
+            ReturnEvent.Event = Result.rows[0].name;
+            Result = await db.query(EffectsQuery, [ranDom(Events.RandEventEffectNames.length)]);
+            ReturnEvent.EventEffect = Result.rows[0].name; ReturnEvent.EventEffectExplanation = Result.rows[0].explanation;
+            break;
+        default:
+            break;
+    }
+    return ReturnEvent;
+}

@@ -5,6 +5,7 @@
 import express from 'express';
 import {MagicItem} from '../models/Etc';
 import * as QTService from '../services/QTService';
+import {Event} from '../models/Events';
 
 const QTRouter = express.Router();
 
@@ -23,5 +24,39 @@ QTRouter.get('/magicItem/:powers/:curse/:curselevel', async (req: any, res) => {
         return;
     }
 });
+
+QTRouter.get('/room', async (req: any, res) => {
+    try {
+        const Room:String = await QTService.getRoom();
+        res.json(Room);
+        return;
+    } catch (error){
+        res.status(400).send(error);
+        return;
+    }
+});
+
+QTRouter.get('/building', async (req: any, res) => {
+    try {
+        const Building:String = await QTService.getBuilding();
+        res.json(Building);
+        return;
+    } catch (error){
+        res.status(400).send(error);
+        return;
+    }
+});
+
+QTRouter.get('/event/:type', async (req: any, res) => {
+    try {
+        const ReturnEvent:Event = await QTService.getEvent(req.params.type);
+        res.json(ReturnEvent);
+        return;
+    } catch (error){
+        res.status(400).send(error);
+        return;
+    }
+});
+
 
 export default QTRouter;

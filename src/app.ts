@@ -14,6 +14,7 @@ import QTRouter from "./routers/QTRouter"; // series of functions for the login 
 import AdminRouter from "./routers/AdminRouter"; // series of functions for administrator
 import PersonRouter from './routers/PersonRouter'; //import Person functions
 import SetRouter from './routers/SettingRouter';
+import DungeonRouter from './routers/DungeonRouter';
 import db from "./util/pg-connector"; // connector to the database
 import cors from "cors";
 
@@ -37,6 +38,7 @@ app.use("/QTools", QTRouter); // If the user wants to use the /login path, it se
 app.use("/AdminTools", AdminRouter); // For things the admin needs to manage the system
 app.use("/Person", PersonRouter);
 app.use("/Setting", SetRouter);
+app.use("/Dungeon", DungeonRouter);
 
 process.on("SIGINT", () => {
   db.end().then(() => console.log("pool has ended"));

@@ -11,6 +11,8 @@ import * as Person from '../models/Person';
 import * as Etc from '../models/Etc';
 //import * as Dungeon from '../models/Dungeon';
 import * as Civilization from '../models/Civilization';
+import * as Events from '../models/Events';
+import * as Dungeon from '../models/Dungeon';
 
 
 /**
@@ -128,7 +130,18 @@ export async function rebuildDatabase(){
     query = Tables.GenericTableCreate('CulturalTaboo'); await db.query(query); query = Tables.GenericTableInsertNameOnly('CulturalTaboo', Civilization.MajorTabooNames); await db.query(query);
     query = Tables.GenericTableCreate('SocialProblem'); await db.query(query); query = Tables.GenericTableInsertNameOnly('SocialProblem', Civilization.MajorSocialProblemNames); await db.query(query);
     //Dungeon list
+    query = Tables.GenericTableCreate('ReasonForDungeon'); await db.query(query); query = Tables.GenericTableInsert('ReasonForDungeon', Dungeon.ReasonForDungeonNames, Dungeon.ReasonForDungeonExplanation); await db.query(query);
+    query = Tables.GenericTableCreate('MonsterStationary'); await db.query(query); query = Tables.GenericTableInsert('MonsterStationary', Dungeon.MonsterStationaryBehaviorNames, Dungeon.MonsterStationaryBehaviorExplanation); await db.query(query);
+    query = Tables.GenericTableCreate('MonsterWandering'); await db.query(query); query = Tables.GenericTableInsert('MonsterWandering', Dungeon.MonsterWanderingBehaviorNames, Dungeon.MonsterWanderingBehaviorExplanation);
+    //Dungeon List name only
+    query = Tables.GenericTableCreate('Light'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Light', Dungeon.LightLevel); await db.query(query);
+    query = Tables.GenericTableCreate('QualityOfDungeon'); await db.query(query); query = Tables.GenericTableInsertNameOnly('QualityOfDungeon', Dungeon.QualityOfDungeon); await db.query(query);
+    query = Tables.GenericTableCreate('Material'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Material', Dungeon.Material); await db.query(query);
     //Event list
+    query = Tables.GenericTableCreate('TownEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TownEvents', Events.RandTownEvent); await db.query(query);
+    query = Tables.GenericTableCreate('TravelEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TravelEvents', Events.RandTravelEvent); await db.query(query);
+    query = Tables.GenericTableCreate('DungeonEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('DungeonEvents', Events.RandDungeonEvent); await db.query(query);
+    query = Tables.GenericTableCreate('EventEffects'); await db.query(query); query = Tables.GenericTableInsert('EventEffects', Events.RandEventEffectNames, Events.RandEventEffectExplanations); await db.query(query);
     //Encounter lists?
     //Etc
     query = Tables.GenericTableCreate('Items'); await db.query(query); query = Tables.GenericTableInsert('Items', Etc.ItemsNames, Etc.ItemsExplanations); await db.query(query);
@@ -137,6 +150,7 @@ export async function rebuildDatabase(){
     query = Tables.GenericTableCreate('ApocalypseTiming'); await db.query(query); query = Tables.GenericTableInsert('ApocalypseTiming', Etc.TimingOfApocalypseNames, Etc.TimingOfApocalypseExplanations); await db.query(query);
     query = Tables.GenericTableCreate('SizeofTown'); await db.query(query); query = Tables.GenericTableInsert('SizeofTown', Etc.TownSizeNames, Etc.TownSizeExplanations); await db.query(query);
     //NameOnly Etc Inserts
+    query = Tables.GenericTableCreate('Buildings'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Buildings', Etc.BuildingNames); await db.query(query);
     query = Tables.GenericTableCreate('Rooms'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Rooms', Etc.RoomsNames);await db.query(query);
     query = Tables.GenericTableCreate('Power'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Power', Etc.Power); await db.query(query);
     query = Tables.GenericTableCreate('Activation'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Activation', Etc.ActivationName); await db.query(query);

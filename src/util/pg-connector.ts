@@ -16,4 +16,6 @@ const db = new Pool({ //we use environment variables for security reasons, such 
     user: process.env.DB_USER, // The user information we are logging into the database with
 });
 
+//A 2nd DB may be necessary for ADMIN tab, all tables just for people trying to enter things in, and censored words
+
 export default db; // export all informati6on here for other files to use
