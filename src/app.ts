@@ -9,12 +9,11 @@
 /*{Request, Response} from <- use if something goes wrong*/
 import bodyParser from "body-parser"; // sees if content of request is json, then turn it into object for JS
 import express from "express"; // allows for communication with HTTP requests
-import {pathToRegexp, match, parse, compile} from "path-to-regexp";
 import QTRouter from "./routers/QTRouter"; // series of functions for the login URL
 import AdminRouter from "./routers/AdminRouter"; // series of functions for administrator
 import PersonRouter from './routers/PersonRouter'; //import Person functions
 import SetRouter from './routers/SettingRouter';
-import DungeonRouter from './routers/DungeonRouter';
+import EncounterRouter from './routers/EncounterRouter';
 import db from "./util/pg-connector"; // connector to the database
 import cors from "cors";
 
@@ -38,7 +37,7 @@ app.use("/QTools", QTRouter); // If the user wants to use the /login path, it se
 app.use("/AdminTools", AdminRouter); // For things the admin needs to manage the system
 app.use("/Person", PersonRouter);
 app.use("/Setting", SetRouter);
-app.use("/Dungeon", DungeonRouter);
+app.use("/Encounter", EncounterRouter);
 
 process.on("SIGINT", () => {
   db.end().then(() => console.log("pool has ended"));

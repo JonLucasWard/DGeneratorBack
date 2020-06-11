@@ -132,7 +132,7 @@ export async function rebuildDatabase(){
     //Dungeon list
     query = Tables.GenericTableCreate('ReasonForDungeon'); await db.query(query); query = Tables.GenericTableInsert('ReasonForDungeon', Dungeon.ReasonForDungeonNames, Dungeon.ReasonForDungeonExplanation); await db.query(query);
     query = Tables.GenericTableCreate('MonsterStationary'); await db.query(query); query = Tables.GenericTableInsert('MonsterStationary', Dungeon.MonsterStationaryBehaviorNames, Dungeon.MonsterStationaryBehaviorExplanation); await db.query(query);
-    query = Tables.GenericTableCreate('MonsterWandering'); await db.query(query); query = Tables.GenericTableInsert('MonsterWandering', Dungeon.MonsterWanderingBehaviorNames, Dungeon.MonsterWanderingBehaviorExplanation);
+    query = Tables.GenericTableCreate('MonsterWandering'); await db.query(query); query = Tables.GenericTableInsert('MonsterWandering', Dungeon.MonsterWanderingBehaviorNames, Dungeon.MonsterWanderingBehaviorExplanation); await db.query(query);
     //Dungeon List name only
     query = Tables.GenericTableCreate('Light'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Light', Dungeon.LightLevel); await db.query(query);
     query = Tables.GenericTableCreate('QualityOfDungeon'); await db.query(query); query = Tables.GenericTableInsertNameOnly('QualityOfDungeon', Dungeon.QualityOfDungeon); await db.query(query);

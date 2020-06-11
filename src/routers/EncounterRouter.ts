@@ -2,12 +2,12 @@ import express from 'express';
 import {Dungeon} from '../models/Dungeon';
 import {getDungeon} from '../services/DungeonService';
 
-const DungeonRouter = express.Router();
+const EncounterRouter = express.Router();
 
 /**
  *get a single test object based on its ID
  */
-DungeonRouter.get('/newDungeon', async (req: any, res) => {
+EncounterRouter.get('/newDungeon', async (req: any, res) => {
     try {
         const Dungeon:Dungeon = await getDungeon(); //call the testService getid function, using the id
         res.json(Dungeon); //give a response to the caller of the Test object
@@ -18,4 +18,4 @@ DungeonRouter.get('/newDungeon', async (req: any, res) => {
     }
 });
 
-export default DungeonRouter;
+export default EncounterRouter;
