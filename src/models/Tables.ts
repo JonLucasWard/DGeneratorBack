@@ -1,3 +1,6 @@
+import { AreaControlNames } from "./Civilization";
+import {categories, FifthEMonsters} from './5eMonsters';
+
 export function GenericTableCreate(tableName:string){
     let query = `CREATE TABLE ${tableName}(
         id serial PRIMARY KEY,
@@ -21,6 +24,32 @@ export function GenericTableInsertNameOnly(tableName:string, Names:Array<string>
     let query = `INSERT INTO ${tableName}(Name)
     ${valuesNames(Names)};` //to automatically insert a series of values into Name and Explanation
     //the values function is called which will turn the string arrays into a single string of value rows for SQL
+    return query;
+}
+
+//make logic for creating encounter table (try to make generic version for all based on inputted columns needed for each game system
+//then logic for actually filling those values once filled with data
+
+export function Create5eEncounterTable(tableName:string){
+    let query = `CREATE TABLE ${tableName}(
+        id serial PRIMARY KEY,
+        name varchar (150) NOT NULL,
+        cr decimal NOT NULL,
+        size varchar (50) NOT NULL,
+        type varchar (150) NOT NULL,
+        alignment varchar (50),
+        environment text,
+        source text
+    );`
+    return query
+}
+
+export function Insert5eEncounterTable(tableName:string){
+    let query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source)
+    ${FifthEEncounterValues(FifthEMonsters)};`
+
+
+    console.log(query);
     return query;
 }
 
@@ -49,11 +78,31 @@ function valuesNames(names:Array<string>){ //hard data will be saved as an array
     let valueString = `VALUES`; //start the string
     for(let i = 0; i < names.length; i++){ //there will ALWAYS be a name, increment over those
         if(i < names.length-1){ //so long as we're not at the last item in names, do the following:
-            valueString += `('${names[i]}'), `; //create a row entry, includes period
+            valueString += `('${names[i]}'), `; //create a row entry, includes comma
         } else {
-            valueString += `('${names[i]}')`; //create row entry, no period as it is final entry
+            valueString += `('${names[i]}')`; //create row entry, no comma as it is final entry
         }   
     }
     return valueString; //give back the giant string to be used as values
 }
 
+function FifthEEncounterValues(data){
+    let valueString = `VALUES`;
+    for(let i = 0; i < data.length; i++){
+            valueString += `(`; //starting a new row
+        for(let x = 0; x < data[i].length; x++){
+            if(x === 1){ //check if CR, it wants a number so no quotes around it like a string would have
+                valueString += `${data[i][x]}, `;
+            }
+            else if(x < data[i].length-1){ //most entries go here, somewhere in the middle
+                valueString += `'${data[i][x]}', `;
+            }
+            else if(x === data[i].length-1 && i === data.length-1 ){ //the very last entry of the whole thing
+                valueString += `'${data[i][x]}')`;
+            } else { //end of a row
+                valueString += `'${data[i][x]}'),`;
+            }
+        }
+    }
+    return valueString;
+}

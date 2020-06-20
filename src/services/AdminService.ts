@@ -142,7 +142,9 @@ export async function rebuildDatabase(){
     query = Tables.GenericTableCreate('TravelEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TravelEvents', Events.RandTravelEvent); await db.query(query);
     query = Tables.GenericTableCreate('DungeonEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('DungeonEvents', Events.RandDungeonEvent); await db.query(query);
     query = Tables.GenericTableCreate('EventEffects'); await db.query(query); query = Tables.GenericTableInsert('EventEffects', Events.RandEventEffectNames, Events.RandEventEffectExplanations); await db.query(query);
-    //Encounter lists?
+    //Encounter lists
+    query = Tables.Create5eEncounterTable('DND5eMonsters'); await db.query(query); query = Tables.Insert5eEncounterTable('DND5eMonsters'); await db.query(query);
+
     //Etc
     query = Tables.GenericTableCreate('Items'); await db.query(query); query = Tables.GenericTableInsert('Items', Etc.ItemsNames, Etc.ItemsExplanations); await db.query(query);
     query = Tables.GenericTableCreate('ItemAge'); await db.query(query); query = Tables.GenericTableInsert('ItemAge', Etc.ItemAgeName, Etc.ItemAgeExplanation); await db.query(query);
