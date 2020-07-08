@@ -33,6 +33,15 @@ export class Dungeon {
     }
 }
 
+export class Trap {
+    public Trigger:string; public Effect:string; public Details:string;
+    public findDifficulty:string; public disableDifficulty:string;
+
+    constructor(Trigger:string = null, Effect:string = null, Details:string = null, findDifficulty:string = null, disableDifficulty:string = null){
+        this.Trigger = Trigger; this.Effect = Effect; this.Details = Details; this.findDifficulty = findDifficulty; this.disableDifficulty = disableDifficulty;
+    }
+}
+
 export const ReasonForDungeonNames = [
     'Reason 1',
     'Reason 2',
@@ -89,5 +98,28 @@ export const MonsterWanderingBehaviorExplanation =[
     'e3'
 ]
 
-//Random Treasure
-//Traps
+export const TrapTriggers =[
+    'trigger1',
+    'trigger2',
+    'trigger3'
+]
+
+export const TrapEffect =[
+    'e1',
+    'e2',
+    'e3'
+]
+
+export const TrapDetails =[
+    'd1',
+    'd2',
+    'd3'
+]
+
+export const Difficulties =[
+    'Very Easy',
+    'Easy',
+    'Medium',
+    'Hard',
+    'Very Hard'
+]

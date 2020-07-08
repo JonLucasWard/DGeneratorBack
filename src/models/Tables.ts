@@ -1,5 +1,6 @@
 import { AreaControlNames } from "./Civilization";
 import {categories, FifthEMonsters} from './5eMonsters';
+import {Quests} from './Etc';
 
 export function GenericTableCreate(tableName:string){
     let query = `CREATE TABLE ${tableName}(
@@ -47,9 +48,21 @@ export function Create5eEncounterTable(tableName:string){
 export function Insert5eEncounterTable(tableName:string){
     let query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source)
     ${FifthEEncounterValues(FifthEMonsters)};`
+    return query;
+}
 
+export function CreateQuestTable(tableName:string){
+    let query = `Create Table ${tableName}(
+        id serial PRIMARY KEY,
+        name varchar (150) NOT NULL,
+        explanation text,
+        tags text
+    );`
+    return query;
+}
 
-    console.log(query);
+export function InsertQuestTable(tableName:string){
+    let query = `INSERT INTO ${tableName}(name, explanation, tags) ${QuestValues(Quests)};`
     return query;
 }
 
@@ -85,6 +98,24 @@ function valuesNames(names:Array<string>){ //hard data will be saved as an array
     }
     return valueString; //give back the giant string to be used as values
 }
+
+function QuestValues(data){
+    let valueString = `VALUES`;
+    for(let i = 0; i<data.length; i++){
+        valueString += `(`; //starting new entry
+        for(let x = 0; x<data[i].length; x++){
+            if(x < data[i].length-1){ //entry in a row that is not the last
+                valueString +=`'${data[i][x]}', `;
+            } else if(x === data[i].length-1 && i === data.length-1){
+                valueString += `'${data[i][x]}')`; //very last entry
+            } else { //last entry of a row
+                valueString += `'${data[i][x]}'),`;
+            }
+        }
+    }
+    return valueString;
+}
+
 
 function FifthEEncounterValues(data){
     let valueString = `VALUES`;

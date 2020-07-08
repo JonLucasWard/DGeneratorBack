@@ -186,6 +186,18 @@ export const BuildingNames =[
     'Building3'
 ]
 
+export class Quest{
+    public QuestName:string; public QuestExplanation:string;
+    public Tags:string;
+    constructor(
+        QuestName:string = null, QuestExplanation:string= null,
+        Tags:string = null
+    ){
+        this.QuestName = QuestName; this.QuestExplanation = QuestExplanation; this.Tags = Tags;
+    }
+
+};
+
 export class MagicItem{
     public Item:string; public ItemExplanation:string;
     public ItemAge:string; public ItemAgeExplanation:string;
@@ -1276,4 +1288,10 @@ export const TownSizeExplanations =[
     'There is a large number of people gathered in this given area, the majority of which relate to each other through a government or faction which is charged with peace keeping. Most people are present here likely due to a valuable resource or environmental quirk',
     'While the area may be physically large, there are few people who live here. They may have very close bonds, are isolated hermits, or only vaguely know each other. Generally each person is expected to be self-sufficient',
     'A city of the largest caliber, with enough souls and resources to challenge other nations alone if need be. This city is likely generations old but still holds highly valuable resources'
+]
+
+export const Quests =[
+    ['Q1', 'E1', 'criminal'],
+    ['Q2', 'E2', 'explorer'],
+    ['Q3', 'E3', 'law']
 ]

@@ -129,6 +129,8 @@ export async function rebuildDatabase(){
     query = Tables.GenericTableCreate('CulturalValue'); await db.query(query); query = Tables.GenericTableInsertNameOnly('CulturalValue', Civilization.MajorCulturalValueNames); await db.query(query);
     query = Tables.GenericTableCreate('CulturalTaboo'); await db.query(query); query = Tables.GenericTableInsertNameOnly('CulturalTaboo', Civilization.MajorTabooNames); await db.query(query);
     query = Tables.GenericTableCreate('SocialProblem'); await db.query(query); query = Tables.GenericTableInsertNameOnly('SocialProblem', Civilization.MajorSocialProblemNames); await db.query(query);
+    //Difficulty Util Table
+    query = Tables.GenericTableCreate('Difficulty'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Difficulty', Dungeon.Difficulties); await db.query(query);
     //Dungeon list
     query = Tables.GenericTableCreate('ReasonForDungeon'); await db.query(query); query = Tables.GenericTableInsert('ReasonForDungeon', Dungeon.ReasonForDungeonNames, Dungeon.ReasonForDungeonExplanation); await db.query(query);
     query = Tables.GenericTableCreate('MonsterStationary'); await db.query(query); query = Tables.GenericTableInsert('MonsterStationary', Dungeon.MonsterStationaryBehaviorNames, Dungeon.MonsterStationaryBehaviorExplanation); await db.query(query);
@@ -142,6 +144,10 @@ export async function rebuildDatabase(){
     query = Tables.GenericTableCreate('TravelEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TravelEvents', Events.RandTravelEvent); await db.query(query);
     query = Tables.GenericTableCreate('DungeonEvents'); await db.query(query); query = Tables.GenericTableInsertNameOnly('DungeonEvents', Events.RandDungeonEvent); await db.query(query);
     query = Tables.GenericTableCreate('EventEffects'); await db.query(query); query = Tables.GenericTableInsert('EventEffects', Events.RandEventEffectNames, Events.RandEventEffectExplanations); await db.query(query);
+    //Trap List
+    query = Tables.GenericTableCreate('TrapTriggers'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TrapTriggers', Dungeon.TrapTriggers); await db.query(query);
+    query = Tables.GenericTableCreate('TrapEffects'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TrapEffects', Dungeon.TrapEffect); await db.query(query);
+    query = Tables.GenericTableCreate('TrapDetails'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TrapDetails', Dungeon.TrapDetails); await db.query(query);
     //Encounter lists
     query = Tables.Create5eEncounterTable('DND5eMonsters'); await db.query(query); query = Tables.Insert5eEncounterTable('DND5eMonsters'); await db.query(query);
 
@@ -157,6 +163,8 @@ export async function rebuildDatabase(){
     query = Tables.GenericTableCreate('Power'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Power', Etc.Power); await db.query(query);
     query = Tables.GenericTableCreate('Activation'); await db.query(query); query = Tables.GenericTableInsertNameOnly('Activation', Etc.ActivationName); await db.query(query);
     query = Tables.GenericTableCreate('TownWealth'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TownWealth', Etc.WealthOfTownNames); await db.query(query);
+    //Quest Table
+    query = Tables.CreateQuestTable('Quests'); await db.query(query); query = Tables.InsertQuestTable('Quests'); await db.query(query);
     return;
 }
 

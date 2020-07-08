@@ -1,5 +1,5 @@
 import db from '../util/pg-connector'; // To allow access to the database at all
-import {MagicItem} from '../models/Etc';
+import {MagicItem, Quest} from '../models/Etc';
 import * as E from '../models/Etc';
 import {Event} from '../models/Events';
 import * as Events from '../models/Events';
@@ -111,3 +111,19 @@ export async function getEvent(type:string): Promise<Event>{
     }
     return ReturnEvent;
 }
+
+export async function getQuest(tags:string): Promise<Quest>{
+    if(tags === "--ANY--"){
+        var queryString = `select name, explanation, tags from Quests where id = ${ranDom(E.Quests.length)};`;
+        //run above simple and straight
+    } else{
+        //IF USING TAGS, NEED TO MAKE A TEMP TABLE THEN GET A RANDOM NUMBER FROM THAT!!!
+        var queryString = `select name, explanation, tags from Quests where id = ${ranDom(E.Quests.length)} AND tags ILIKE '%${tags}%';`
+    }
+    console.log(queryString);
+    var Result = await db.query(queryString);
+    var returnQuest:Quest = new Quest();
+    returnQuest.QuestName = Result.rows[0].name; returnQuest.QuestExplanation = Result.rows[0].explanation; returnQuest.Tags = Result.rows[0].tags;
+
+    return returnQuest;
+} 

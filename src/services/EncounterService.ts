@@ -1,6 +1,6 @@
 import db from '../util/pg-connector'; // To allow access to the database at all
 import * as D from '../models/Dungeon';
-import {Dungeon} from '../models/Dungeon';
+import {Dungeon, Trap} from '../models/Dungeon';
 import * as S from '../models/Civilization';
 import * as E from '../models/Etc';
 import {FifthMonster, CRValues} from '../models/5eMonsters';
@@ -200,4 +200,29 @@ while(total < XPTotal){ //for as long as the encounter total is under the allowe
 }
 console.log("exiting for other reason...");
 return monsterArray;
+}
+
+export async function getTrap(): Promise<Trap> {
+    var returnTrap = new Trap();
+    let Result =  await db.query(`select name from TrapTriggers where id = $1`, [ranDom(D.TrapTriggers.length)]);
+    returnTrap.Trigger = Result.rows[0].name;
+    Result = await db.query(`select name from TrapEffects where id = $1`, [ranDom(D.TrapEffect.length)]);
+    returnTrap.Effect = Result.rows[0].name;
+    Result = await db.query(`select name from TrapDetails where id = $1`, [ranDom(D.TrapDetails.length)]);
+    returnTrap.Details = Result.rows[0].name;
+    Result = await db.query(`select name from Difficulty where id = $1`, [ranDom(D.Difficulties.length)]);
+    returnTrap.disableDifficulty = Result.rows[0].name;
+    Result = await db.query(`select name from Difficulty where id = $1`, [ranDom(D.Difficulties.length)]);
+    returnTrap.findDifficulty = Result.rows[0].name;
+
+    return returnTrap;
+}
+
+export async function getTreasure(number:number){
+    let returnItems = [];    
+    for (let i = 0; i < number; i++){
+        let Result = await db.query(`select name from items where id = $1`, [ranDom(E.ItemsNames.length)]);
+        returnItems.push(Result.rows[0].name);
+    }
+    return returnItems;
 }

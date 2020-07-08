@@ -3,7 +3,7 @@
  * given certain HTTP commands.
  */
 import express from 'express';
-import {MagicItem} from '../models/Etc';
+import {MagicItem, Quest} from '../models/Etc';
 import * as QTService from '../services/QTService';
 import {Event} from '../models/Events';
 
@@ -58,5 +58,15 @@ QTRouter.get('/event/:type', async (req: any, res) => {
     }
 });
 
+QTRouter.get('/quest/:tags', async (req: any, res) =>{
+    try {
+        const quests:Quest = await QTService.getQuest(req.params.tags);
+        res.json(quests);
+        return;
+    } catch (error){
+        res.status(400).send(error);
+        return;
+    }
+});
 
 export default QTRouter;
