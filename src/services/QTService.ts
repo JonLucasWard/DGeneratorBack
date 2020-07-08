@@ -113,17 +113,20 @@ export async function getEvent(type:string): Promise<Event>{
 }
 
 export async function getQuest(tags:string): Promise<Quest>{
+    var returnQuest:Quest = new Quest();
     if(tags === "--ANY--"){
         var queryString = `select name, explanation, tags from Quests where id = ${ranDom(E.Quests.length)};`;
-        //run above simple and straight
+        var Result = await db.query(queryString);
+        returnQuest.QuestName = Result.rows[0].name; returnQuest.QuestExplanation = Result.rows[0].explanation; returnQuest.Tags = Result.rows[0].tags;
     } else{
-        //IF USING TAGS, NEED TO MAKE A TEMP TABLE THEN GET A RANDOM NUMBER FROM THAT!!!
-        var queryString = `select name, explanation, tags from Quests where id = ${ranDom(E.Quests.length)} AND tags ILIKE '%${tags}%';`
+        var queryString = `create temp table myTable as
+        SELECT id, name, explanation, tags FROM Quests WHERE tags ILIKE '%${tags}%';`
+        await db.query(queryString);
+        queryString = `SELECT name, explanation, tags from myTable ORDER BY random() LIMIT 1;`
+        let Result = await db.query(queryString);
+        returnQuest.QuestName = Result.rows[0].name; returnQuest.QuestExplanation = Result.rows[0].explanation; returnQuest.Tags = Result.rows[0].tags;
+        queryString = `DROP TABLE IF EXISTS myTable CASCADE;`;
+        await db.query(queryString);
     }
-    console.log(queryString);
-    var Result = await db.query(queryString);
-    var returnQuest:Quest = new Quest();
-    returnQuest.QuestName = Result.rows[0].name; returnQuest.QuestExplanation = Result.rows[0].explanation; returnQuest.Tags = Result.rows[0].tags;
-
     return returnQuest;
 } 
