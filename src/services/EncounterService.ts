@@ -219,10 +219,10 @@ export async function getTrap(): Promise<Trap> {
 }
 
 export async function getTreasure(number:number){
-    let returnItems = [];    
+    let returnItems= [[]];    
     for (let i = 0; i < number; i++){
         let Result = await db.query(`select name from items where id = $1`, [ranDom(E.ItemsNames.length)]);
-        returnItems.push(Result.rows[0].name);
+        returnItems[0].push(Result.rows[0].name);
     }
     return returnItems;
 }

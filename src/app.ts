@@ -16,6 +16,7 @@ import SetRouter from './routers/SettingRouter';
 import EncounterRouter from './routers/EncounterRouter';
 import db from "./util/pg-connector"; // connector to the database
 import cors from "cors";
+import UserDataRouter from "./routers/UserDataRouter";
 
 const app = express(); // opens an instance of express to communicate with HTTP, this is the "app" in total
 const port = 3222; // the local port we are communicating with to do this
@@ -38,6 +39,7 @@ app.use("/AdminTools", AdminRouter); // For things the admin needs to manage the
 app.use("/Person", PersonRouter);
 app.use("/Setting", SetRouter);
 app.use("/Encounter", EncounterRouter);
+app.use("/UserData", UserDataRouter);
 
 process.on("SIGINT", () => {
   db.end().then(() => console.log("pool has ended"));
