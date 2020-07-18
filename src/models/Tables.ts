@@ -11,6 +11,17 @@ export function GenericTableCreate(tableName:string){
     return query; 
 }
 
+export function GenericAdminTableCreate(tableName:string){
+    let query = `CREATE TABLE ${tableName}(
+        id serial PRIMARY KEY,
+        userid integer,
+        Name varchar (150) NOT NULL,
+        Explanation text,
+        timestamp varchar(150) NOT NULL
+    );`; //should create a table with an auto-incrementing ID, name of 100 chars, and explanation if needed, name of table must be provided
+    return query; 
+}
+
 export function GenericTableDrop(tableName:string){
     let query = `DROP TABLE IF EXISTS ${tableName} CASCADE;`; //basically deletes a given table
     return query;
@@ -25,6 +36,16 @@ export function GenericTableInsertNameOnly(tableName:string, Names:Array<string>
     let query = `INSERT INTO ${tableName}(Name)
     ${valuesNames(Names)};` //to automatically insert a series of values into Name and Explanation
     //the values function is called which will turn the string arrays into a single string of value rows for SQL
+    return query;
+}
+
+export function CreateAdminTable(){
+    let query = `CREATE TABLE admindb(
+        id serial PRIMARY KEY,
+        affectedTable varchar(150),
+        otherid integer,
+        timestamp varchar(150)
+    );`;
     return query;
 }
 
@@ -45,6 +66,22 @@ export function Create5eEncounterTable(tableName:string){
     return query
 }
 
+export function Create5eEncounterAdminTable(tableName:string){
+    let query = `CREATE TABLE ${tableName}(
+        id serial PRIMARY KEY,
+        mainid integer,
+        name varchar (150) NOT NULL,
+        cr decimal NOT NULL,
+        size varchar (50) NOT NULL,
+        type varchar (150) NOT NULL,
+        alignment varchar (50),
+        environment text,
+        source text,
+        timestamp varchar (150)
+    );`
+    return query
+}
+
 export function Insert5eEncounterTable(tableName:string){
     let query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source)
     ${FifthEEncounterValues(FifthEMonsters)};`
@@ -57,6 +94,18 @@ export function CreateQuestTable(tableName:string){
         name varchar (150) NOT NULL,
         explanation text,
         tags text
+    );`
+    return query;
+}
+
+export function CreateAdminQuestTable(tableName:string){
+    let query = `Create Table ${tableName}(
+        id serial PRIMARY KEY,
+        mainid integer,
+        name varchar (150) NOT NULL,
+        explanation text,
+        tags text,
+        timestamp varchar (150)
     );`
     return query;
 }

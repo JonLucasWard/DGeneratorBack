@@ -17,5 +17,12 @@ const db = new Pool({ //we use environment variables for security reasons, such 
 });
 
 //A 2nd DB may be necessary for ADMIN tab, all tables just for people trying to enter things in, and censored words
+export const addb = new Pool({
+    database: process.env.ADMINDB,
+    host: process.env.HOST,
+    password: process.env.DB_PASSWORD,
+    port: Number(process.env.BACKEND_PORT),
+    user: process.env.DB_USER
+});
 
 export default db; // export all informati6on here for other files to use

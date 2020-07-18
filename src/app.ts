@@ -17,6 +17,7 @@ import EncounterRouter from './routers/EncounterRouter';
 import db from "./util/pg-connector"; // connector to the database
 import cors from "cors";
 import UserDataRouter from "./routers/UserDataRouter";
+import { addb } from "./util/pg-connector";
 
 const app = express(); // opens an instance of express to communicate with HTTP, this is the "app" in total
 const port = 3222; // the local port we are communicating with to do this
@@ -42,7 +43,8 @@ app.use("/Encounter", EncounterRouter);
 app.use("/UserData", UserDataRouter);
 
 process.on("SIGINT", () => {
-  db.end().then(() => console.log("pool has ended"));
+  db.end().then(() => console.log("user pool has ended"));
+  addb.end().then(() => console.log("admin pool as ended"))
   port_handler.close();
 }); // When a user INTerrupts the SIGnal going to the app, turn off the database,
 // close the database connection and tell us.

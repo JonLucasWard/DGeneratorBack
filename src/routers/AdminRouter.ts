@@ -3,18 +3,19 @@ import Test from '../models/test';
 import * as AdminService from '../services/AdminService';
 import * as Civilization from '../models/Civilization';
 import * as Tables from '../models/Tables';
+import { json } from 'body-parser';
 
 const AdminRouter = express.Router();
 
 /**
  *get a single test object based on its ID
  */
-AdminRouter.get('/test/:id', async (req: any, res) => { //when accessing the /:id path, create an async call
+AdminRouter.get('/test/:id/:target', async (req: any, res) => { //when accessing the /:id path, create an async call
     //YOU MUST USE /:{parameter}, anything else is just a query (strings)
     try {
         const id = parseInt(req.params.id, 10); //pull the id parameter from the received message
         //const Test = await QTService.getAll();
-        const Test: Test = await AdminService.getid(id); //call the testService getid function, using the id
+        const Test: Test = await AdminService.getid(id, req.params.target); //call the testService getid function, using the id
         res.json(Test); //give a response to the caller of the Test object
         return;
     } catch (error) { //if an error happens (IE a bad id which doesn't exist, or a non-number)
@@ -23,9 +24,9 @@ AdminRouter.get('/test/:id', async (req: any, res) => { //when accessing the /:i
     }
 });
 
-AdminRouter.get('/test', async (req: any, res) => {
+AdminRouter.get('/test/:target', async (req: any, res) => {
     try {
-        const tests = await AdminService.getAll();
+        const tests = await AdminService.getAll(req.params.target);
         res.json(tests);
         return;
     } catch (error) {
@@ -34,10 +35,10 @@ AdminRouter.get('/test', async (req: any, res) => {
     }
 });
 
-AdminRouter.patch('/test/', async (req: any, res) => {
+AdminRouter.patch('/test/:target', async (req: any, res) => {
     try {
         const patch: Test = req.body;
-        const patchedInv: Test = await AdminService.updateTest(patch);
+        const patchedInv: Test = await AdminService.updateTest(patch, req.params.target);
         res.json(patchedInv);
         return;
     } catch(error) {
@@ -45,9 +46,9 @@ AdminRouter.patch('/test/', async (req: any, res) => {
     }
 });
 
-AdminRouter.post('/rebuild/',async (req: any, res)=>{
+AdminRouter.post('/rebuild/:target',async (req: any, res)=>{
     try{
-        await AdminService.rebuildTest();
+        await AdminService.rebuildTest(req.params.target);
         res.json('Success!');
         return;
     } catch (error) {
@@ -56,9 +57,9 @@ AdminRouter.post('/rebuild/',async (req: any, res)=>{
     }
 });
 
-AdminRouter.post('/resetTest/', async (req, res) =>{
+AdminRouter.post('/resetTest/:target', async (req, res) =>{
     try{
-        await AdminService.resetTest();
+        await AdminService.resetTest(req.params.target);
         res.json('Success!');
         return;
     } catch (error) {
@@ -67,9 +68,9 @@ AdminRouter.post('/resetTest/', async (req, res) =>{
     }
 });
 
-AdminRouter.post('/insertTest/', async (req, res) =>{
+AdminRouter.post('/insertTest/:target', async (req, res) =>{
     try{
-        await AdminService.insertTest();
+        await AdminService.insertTest(req.params.target);
         res.json('Success!');
         return;
     } catch (error) {
@@ -78,9 +79,9 @@ AdminRouter.post('/insertTest/', async (req, res) =>{
     }
 });
 
-AdminRouter.get('/rebuildDatabase/', async(req, res) =>{
+AdminRouter.get('/rebuildMainDatabase/', async(req, res) =>{
     try{
-        await AdminService.rebuildDatabase();
+        await AdminService.rebuildMainDatabase();
         res.json('Success!');
         return;
     } catch (error) {
@@ -89,6 +90,17 @@ AdminRouter.get('/rebuildDatabase/', async(req, res) =>{
     }
 
     
+});
+
+AdminRouter.get('/rebuildAdminDatabase/', async(req, res) =>{
+    try{
+        await AdminService.rebuildAdminDatabase();
+        res.json("Success!");
+        return;
+    }catch (error){
+        res.status(400).send(error);
+        return;
+    }
 });
 
 export default AdminRouter;

@@ -5,6 +5,7 @@
 import Test from '../models/test'; // We want to have data conform to the user object model
 import * as Tables from '../models/Tables';
 import db from '../util/pg-connector'; // To allow access to the database at all
+import {addb} from '../util/pg-connector';
 import * as Religion from '../models/Religion';
 import * as Person from '../models/Person';
 //import * as Events from '../models/Events';
@@ -48,27 +49,40 @@ import * as Dungeon from '../models/Dungeon';
 //     return answer; // ends the function
 // }
 
-export async function rebuildTest(){ //create the Test table so it can be messed around with
+export async function rebuildTest(target){ //create the Test table so it can be messed around with
     //await db.query(`CREATE TABLE Test (id serial PRIMARY KEY, Name varchar (100) NOT NULL, Explanation text);`);
+    
     let query = Tables.GenericTableCreate('Test');
-    await db.query(query);
+    if(target === 'admin'){
+    await addb.query(query);
+    } else{
+       await db.query(query);
+    }
     return;
 };
 
-export async function insertTest(){
+export async function insertTest(target){
     let query = Tables.GenericTableInsert('Test', Tables.TestTableNames, Tables.TestTableExplanations);
-    await db.query(query);
+    if(target === 'admin'){
+        await addb.query(query);
+        } else{
+            await db.query(query);
+        }
     return;
 };
 
-export async function resetTest(){ //drop and remake Test table after doing something stupid to it
+export async function resetTest(target){ //drop and remake Test table after doing something stupid to it
     let query = Tables.GenericTableDrop('Test');
-    await db.query(query);
-    await rebuildTest();
+    if(target === 'admin'){
+        await addb.query(query);
+        } else{
+            await db.query(query);
+        }
+    await rebuildTest(target);
     return;
 }
 
-export async function rebuildDatabase(){
+export async function rebuildMainDatabase(){
     await db.query(Tables.DropDatabase); await db.query(Tables.RebuildPublic); //completely reset database, current is deleted and only a public schema is left
     
     //other notes: table names can't have spaces (I know there's a way to do it, but it's annoying to me)
@@ -168,13 +182,122 @@ export async function rebuildDatabase(){
     return;
 }
 
+export async function rebuildAdminDatabase(){
+    await addb.query(Tables.DropDatabase); await addb.query(Tables.RebuildPublic); //completely reset database, current is deleted and only a public schema is left
+    
+    //other notes: table names can't have spaces (I know there's a way to do it, but it's annoying to me)
+    //Can't have \' in the text, postgres doesn't like that
+
+    //what follows is the creation of each given table, and inserting the appropriate values into that table, the same query string variable is used to avoid unnecessary creation 
+    //Religion
+    let query:string = Tables.GenericAdminTableCreate('Belief'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('DivineIs'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('RelationsWithOtherReligions'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('StudyofDivineIs'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Cosmology'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('ExistenceIs'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('PeopleAre'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('TheAfterlifeIs'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('ToBeSavedYou'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('EvilIs'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('NatureIs'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('OrganizedReligionIs'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('ClergyQuirk'); await addb.query(query);
+    //NameOnly Religion Inserts
+    query = Tables.GenericAdminTableCreate('ViceThemeVirtue'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('PoliticalRelations'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Demographic'); await addb.query(query);
+    //NOTE, govt style is included in religion generation
+    //Person
+    query = Tables.GenericAdminTableCreate('Motive'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('FirstInteraction'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('Hobby'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('Crime'); await addb.query(query); 
+    //NameOnly Person Inserts
+    query = Tables.GenericAdminTableCreate('Vice'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Virtue'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Height'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Weight'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Sexuality');await addb.query(query);
+    query = Tables.GenericAdminTableCreate('GenderFeatures'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Age'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Occupation'); await addb.query(query);
+    //Civilization
+    query = Tables.GenericAdminTableCreate('GovtType'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Biomes'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('AreaControlled'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('EnergyInfrastructure'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('GovernmentReligiousRelations'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('EconomicFocus'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('GenderRelations'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('MagicorTechRelations'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('ForeignRelations'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('MilitarySpecialty'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('FrequentIssue'); await addb.query(query);
+    //NameOnly Civilization Inserts
+    query = Tables.GenericAdminTableCreate('PopulationDistribution'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('MajoritiesandMinorities'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('PopulationTrait'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('TransportationInfrastructure'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('PopularIssue'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('CulturalValue'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('CulturalTaboo'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('SocialProblem'); await addb.query(query); 
+    //Difficulty Util Table
+    query = Tables.GenericAdminTableCreate('Difficulty'); await addb.query(query); 
+    //Dungeon list
+    query = Tables.GenericAdminTableCreate('ReasonForDungeon'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('MonsterStationary'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('MonsterWandering'); await addb.query(query); 
+    //Dungeon List name only
+    query = Tables.GenericAdminTableCreate('Light'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('QualityOfDungeon'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('Material'); await addb.query(query);
+    //Event list
+    query = Tables.GenericAdminTableCreate('TownEvents'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('TravelEvents'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('DungeonEvents'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('EventEffects'); await addb.query(query); 
+    //Trap List
+    query = Tables.GenericAdminTableCreate('TrapTriggers'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('TrapEffects'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('TrapDetails'); await addb.query(query);
+    //Encounter lists
+    query = Tables.Create5eEncounterAdminTable('DND5eMonsters'); await addb.query(query);
+
+    //Etc
+    query = Tables.GenericAdminTableCreate('Items'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('ItemAge'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('Apocalypse'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('ApocalypseTiming'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('SizeofTown'); await addb.query(query); 
+    //NameOnly Etc Inserts
+    query = Tables.GenericAdminTableCreate('Buildings'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('Rooms'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('Power'); await addb.query(query);
+    query = Tables.GenericAdminTableCreate('Activation'); await addb.query(query); 
+    query = Tables.GenericAdminTableCreate('TownWealth'); await addb.query(query); 
+    //Quest Table
+    query = Tables.CreateAdminQuestTable('Quests'); await addb.query(query);
+    
+    //NEED UNIQUE ADMIN TABLE
+    query = Tables.CreateAdminTable(); await addb.query(query);
+
+    return;
+}
+
 /**
  * The following function should return a User object matching the ID of the desired user.
  * @param ID passed in from the app user's Json, should equal an ID in the database
  */
-export async function getid(ID: number): Promise<Test> {
+export async function getid(ID: number, target): Promise<Test> {
     const queryString = `select id, Name, explanation from Test where id = $1`;
-    const result = await db.query(queryString, [ID]);
+    let result;
+    if(target === 'admin'){
+        result = await addb.query(queryString, [ID]);
+        } else{
+            result = await db.query(queryString, [ID]);
+        }
     const Data = result.rows[0]; // userData now contains only the relevant information we want, however
     // it still isn't matched properly
     const matched = new Test(); // We will pass userData into this
@@ -208,9 +331,15 @@ export async function getid(ID: number): Promise<Test> {
  * to know this may be the case.
  * @await the code will not continue until the function after await comes back with a response
  */
-export async function getAll() {
+export async function getAll(target) {
     const queryString = `select id, Name, explanation from Test`; // SQL code to be sent to the database
-    const Results = await db.query(queryString); // send the code.
+    let Results;
+    if(target === 'admin'){
+        Results = await addb.query(queryString);
+        } else{
+            Results = await db.query(queryString);
+        }
+    
     const Data = Results.rows; // making a copy of the desired structure from the database
     // the DB will give more information than we actually need, what we want is in .rows
     const tests = []; // an empty array, it'll be cleaner than trying to actually prune the results
@@ -225,9 +354,14 @@ export async function getAll() {
 }
 
 // The following is for the upd8 function to work properly, as it needs the password field
-export async function getUserPassId(id: number): Promise<Test> {
+export async function getUserPassId(ID: number, target): Promise<Test> {
     const queryString = `select * from Test where id = $1`;
-    const result = await db.query(queryString, [id]);
+    let result;
+    if(target === 'admin'){
+        result = await addb.query(queryString, [ID]);
+        } else{
+            result = await db.query(queryString, [ID]);
+        }
     const Data = result.rows[0]; // userData now contains only the relevant information we want, however
     // it still isn't matched properly
     const matched = new Test(); // We will pass userData into this
@@ -246,8 +380,8 @@ export async function getUserPassId(id: number): Promise<Test> {
  * a user's information to reflect the new data, but not change ANYTHING else.
  * @param patch is passed in information, meant to have the data structure of a User
  */
-export async function updateTest(patch: Test) {
-    const currentState = await getUserPassId(patch.id); // The passed in data will have the ID of the desired user
+export async function updateTest(patch: Test, target) {
+    const currentState = await getUserPassId(patch.id, target); // The passed in data will have the ID of the desired user
     // it also calls the previously defined getUserId function, which returns a full user.
     /**
      * The next object will create a new object with BOTH the original user, and our updates.
@@ -257,9 +391,14 @@ export async function updateTest(patch: Test) {
     const newState = {
         ...currentState, ...patch,
     };
-
-    const result = await db.query(`UPDATE Test SET Name = $1, explanation = $2 WHERE id = $4 RETURNING id, Name, explanation;`,
+    let result;
+    if(target === 'admin'){
+        result = await addb.query(`UPDATE Test SET Name = $1, explanation = $2 WHERE id = $4 RETURNING id, Name, explanation;`,
         [newState.Name, newState.explanation, newState.id]);
+        } else{
+            result = await db.query(`UPDATE Test SET Name = $1, explanation = $2 WHERE id = $4 RETURNING id, Name, explanation;`,
+            [newState.Name, newState.explanation, newState.id]);
+        }
     // The above, MASSIVE query, basically tries to update everything that is reasonable to update using 
     // the newState object
     return result.rows[0];
