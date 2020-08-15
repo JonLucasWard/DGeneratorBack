@@ -521,7 +521,7 @@ export async function getTable(table, pageMin:number, pageMax:number){ //getting
     let results = await addb.query(query);
     return results.rows;
 }
-
+//hello
 export async function denyEntry(table, data){ //admin disapproved of the entry, remove it from adminDB
     let query = `DELETE FROM admindb WHERE otherid = ${data[0].id} AND affectedtable = '${table}';`;
     await addb.query(query);

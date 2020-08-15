@@ -2,9 +2,7 @@ import express from 'express';
 import Test from '../models/test';
 import * as AdminService from '../services/AdminService';
 import * as UserDataService from '../services/UserDataService';
-import * as Civilization from '../models/Civilization';
-import * as Tables from '../models/Tables';
-import { json } from 'body-parser';
+
 
 const AdminRouter = express.Router();
 
