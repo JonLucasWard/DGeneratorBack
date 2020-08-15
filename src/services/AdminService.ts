@@ -83,6 +83,7 @@ export async function resetTest(target){ //drop and remake Test table after doin
 }
 
 export async function rebuildMainDatabase(){
+    console.log(db);
     await db.query(Tables.DropDatabase); await db.query(Tables.RebuildPublic); //completely reset database, current is deleted and only a public schema is left
     
     //other notes: table names can't have spaces (I know there's a way to do it, but it's annoying to me)
@@ -163,7 +164,7 @@ export async function rebuildMainDatabase(){
     query = Tables.GenericTableCreate('TrapEffects'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TrapEffects', Dungeon.TrapEffect); await db.query(query);
     query = Tables.GenericTableCreate('TrapDetails'); await db.query(query); query = Tables.GenericTableInsertNameOnly('TrapDetails', Dungeon.TrapDetails); await db.query(query);
     //Encounter lists
-    query = Tables.Create5eEncounterTable('DND5eMonsters'); await db.query(query); query = Tables.Insert5eEncounterTable('DND5eMonsters'); await db.query(query);
+    query = Tables.Create5eEncounterTable('DND5eMonsters'); await db.query(query); query = Tables.Insert5eEncounterTable('DND5eMonsters', 0); await db.query(query);
 
     //Etc
     query = Tables.GenericTableCreate('Items'); await db.query(query); query = Tables.GenericTableInsert('Items', Etc.ItemsNames, Etc.ItemsExplanations); await db.query(query);
@@ -183,6 +184,7 @@ export async function rebuildMainDatabase(){
 }
 
 export async function rebuildAdminDatabase(){
+    console.log(addb);
     await addb.query(Tables.DropDatabase); await addb.query(Tables.RebuildPublic); //completely reset database, current is deleted and only a public schema is left
     
     //other notes: table names can't have spaces (I know there's a way to do it, but it's annoying to me)
@@ -402,4 +404,128 @@ export async function updateTest(patch: Test, target) {
     // The above, MASSIVE query, basically tries to update everything that is reasonable to update using 
     // the newState object
     return result.rows[0];
+}
+
+export async function addToMainDB(tableName:string, data){
+    let query:string; 
+
+    switch(tableName){ //switch based on table name, keep repeating queries until data is complete
+        case 'DnD5eMonsters':
+            for(let i = 0; i < data.length; i++){
+                if(data[i].mainid !== null){ //we are updating a value
+                    query = `UPDATE ${tableName} SET `;
+                        let objSize = Object.keys(data[i]).length;
+                        let count = 0;
+                        Object.keys(data[i]).forEach((key) =>{
+                            if(count < objSize-1){
+                                if(key === "mainid" || key === "id" || key === "timestamp"){} //skip id, we need that last 
+                                else if(key === "cr"){ //cr can't have string apostrophes
+                                    query +=`${key} = ${data[i][key]}, `;
+                                }
+                                else if(key==="source") { //explanation is our last entry
+                                    query += `${key} = '${data[i][key]}' WHERE id = ${data[i].mainid};`; //last entry
+                                }
+                                else{ query +=`${key} = '${data[i][key]}', `;} //random entry "in middle"
+                            } //technically timestamp should trigger here, but we don't need anything from it
+                            count++;
+                        });
+                        console.log(query);
+                        await db.query(query);
+                        query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}';`;
+                        await addb.query(query);
+                        query = `DELETE FROM DnD5eMonsters WHERE id =${data[i].id};`;
+                        await addb.query(query);
+                } else{ //new entry
+                    query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source) VALUES('${data[i].name}', ${data[i].cr}, '${data[i].size}', '${data[i].type}', '${data[i].alignment}', '${data[i].environment}', '${data[i].source}');`;
+                    await db.query(query); //put in new row
+                    query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}';`;
+                    console.log(query);
+                    await addb.query(query);
+                    query = `DELETE FROM DnD5eMonsters WHERE id = ${data[i].id};`;
+                    console.log(query);
+                    await addb.query(query);
+                }
+            }
+            break;
+        default:
+            for(let i = 0; i < data.length; i++){
+            if(data[i].mainid !== null){ //we are updating a value
+                query = `UPDATE ${tableName} SET `;
+                    let objSize = Object.keys(data[i]).length;
+                    let count = 0;
+                    Object.keys(data[i]).forEach((key) =>{
+                        if(count < objSize-1){
+                            if(key === "mainid" || key === "id" || key==="timestamp"){} //skip id, mainid and timestamp, we need that last 
+                            else if(key==="explanation" && tableName !== "quests") { //explanation is our last entry
+                                query += `${key} = '${data[i][key]}' WHERE id = ${data[i].mainid};`; //last entry
+                            }
+                            else if(key === "tags"){
+                                query += `${key} = '${data[i][key]}' WHERE id = ${data[i].mainid};`;
+                            }
+                            else{ query +=`${key} = '${data[i][key]}', `;} //random entry "in middle"
+                        } 
+                        count++;
+                    });
+                    console.log(query);
+                    await db.query(query);
+                    query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}'`;
+                    await addb.query(query);
+                    query = `DELETE FROM ${tableName} WHERE id = ${data[i].id};`
+                    await addb.query(query);
+                } else{
+                    query = `INSERT INTO ${tableName}(`;
+                    Object.keys(data[i]).forEach((key) =>{
+                        if(key === "mainid" || key ==="id" || key === "timestamp"){} //we dont need these
+                        else if(key === "explanation" && tableName !== "quests"){ //end of sequence
+                            query += ` ${key}) `;
+                        }
+                        else if(key === "tags"){ //end of sequence if quests table
+                            query += ` ${key}) `;
+                        }
+                        else{ //random entry
+                            query += `${key}, `;
+                        }
+                    });
+                    query += 'VALUES('
+                    let objSize = Object.keys(data[i]).length;
+                    let count = 0;
+                    Object.keys(data[i]).forEach((key) =>{
+                        if(count < objSize-1){
+                            if(key === "mainid" || key === "id" || key=== "timestamp"){} //skip id, we need that last
+                            else if(key ==="explanation" && tableName !== "quests"){ //explanations is last if it's not the quest table
+                                query +=`'${data[i][key]}');`;
+                            }
+                            else if(key === "tags"){ //tags is last if we're in the quests table
+                                query +=`'${data[i][key]}');`;
+                            }
+                            else{ query +=`'${data[i][key]}', `;} //random entry "in middle"
+                        } else { //last entry, probably timestamp
+                        }
+                        count++;
+                    });
+                    console.log(query);
+                    await db.query(query);
+                    query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedtable = '${tableName}';`;
+                    await addb.query(query);
+                    query = `DELETE FROM ${tableName} WHERE id = ${data[i].id};`
+                    await addb.query(query);
+                }
+            }
+        break;
+    }
+    return;
+}
+
+export async function getTable(table, pageMin:number, pageMax:number){ //getting a table unique to admin
+    let query = `SELECT * FROM ${table} LIMIT ${pageMax} OFFSET ${pageMin} ORDER BY id`;
+    let results = await addb.query(query);
+    return results.rows;
+}
+
+export async function denyEntry(table, data){ //admin disapproved of the entry, remove it from adminDB
+    let query = `DELETE FROM admindb WHERE otherid = ${data[0].id} AND affectedtable = '${table}';`;
+    await addb.query(query);
+    query = `DELETE FROM ${table} WHERE id = ${data[0].id};`
+    await addb.query(query);
+    return;
 }

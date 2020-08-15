@@ -14,12 +14,27 @@ export function GenericTableCreate(tableName:string){
 export function GenericAdminTableCreate(tableName:string){
     let query = `CREATE TABLE ${tableName}(
         id serial PRIMARY KEY,
-        userid integer,
+        mainid integer,
         Name varchar (150) NOT NULL,
         Explanation text,
         timestamp varchar(150) NOT NULL
     );`; //should create a table with an auto-incrementing ID, name of 100 chars, and explanation if needed, name of table must be provided
     return query; 
+}
+
+export function GenericAdminInsert(tableName:string, data){
+    let quests = "";
+        if(tableName === "quests"){
+            quests = " tags,";
+        }
+    let query;
+    if(tableName === "DnD5eMonsters"){
+        query = `INSERT INTO ${tableName}(mainid, name, cr, size, type, alignment, environment, source, timestamp) ${AdminValues(data)};`
+    } else{
+        query = `INSERT INTO ${tableName}(mainid, name, explanation,${quests} timestamp) ${AdminValues(data)};` //to automatically insert a series of values into Name and Explanation
+    }
+    //the values function is called which will turn the string arrays into a single string of value rows for SQL
+    return query;
 }
 
 export function GenericTableDrop(tableName:string){
@@ -82,9 +97,9 @@ export function Create5eEncounterAdminTable(tableName:string){
     return query
 }
 
-export function Insert5eEncounterTable(tableName:string){
+export function Insert5eEncounterTable(tableName:string, isAdmin:number){
     let query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source)
-    ${FifthEEncounterValues(FifthEMonsters)};`
+    ${FifthEEncounterValues(FifthEMonsters, isAdmin)};`
     return query;
 }
 
@@ -166,8 +181,9 @@ function QuestValues(data){
 }
 
 
-function FifthEEncounterValues(data){
+function FifthEEncounterValues(data, isAdmin){
     let valueString = `VALUES`;
+    let thisTime = new Date(); //creates timestamp of current date
     for(let i = 0; i < data.length; i++){
             valueString += `(`; //starting a new row
         for(let x = 0; x < data[i].length; x++){
@@ -178,11 +194,46 @@ function FifthEEncounterValues(data){
                 valueString += `'${data[i][x]}', `;
             }
             else if(x === data[i].length-1 && i === data.length-1 ){ //the very last entry of the whole thing
-                valueString += `'${data[i][x]}')`;
+                if(isAdmin === 1){
+                    valueString += `'${thisTime}')`;
+                } else{
+                    valueString += `'${data[i][x]}')`;
+                }
             } else { //end of a row
-                valueString += `'${data[i][x]}'),`;
+                if(isAdmin ===1){
+                    valueString += `'${thisTime}'),`;
+                } else{
+                    valueString += `'${data[i][x]}'),`;
+                }
             }
         }
     }
     return valueString;
 }
+
+function AdminValues(data){ //we want the data to have "nulls" for timestamp coming in
+    //ALSO! ALL DATA PASSING IN should be in [[]] format
+    let valueString = `VALUES`;
+    let thisTime = new Date(); //creates timestamp of current date
+    for(let i = 0; i<data.length; i++){
+        valueString += `(`; //starting new entry
+        let objSize = Object.keys(data[i]).length;
+        let count = 0;
+        Object.keys(data[i]).forEach((key) =>{
+            if(count < objSize-1){
+                if(key === "mainid" || key === "cr" || key === "id"){
+                    valueString +=`${data[i][key]},`;
+                } else{
+                valueString +=`'${data[i][key]}',`;}
+            } else if(count === objSize-1 && i === data.length-1){
+                valueString += `'${data[i][key]}', '${thisTime}')`;
+            } else {
+                valueString += `'${data[i][key]}', '${thisTime}'),`;
+            }
+            count++;
+        });
+
+    }
+
+    return valueString;
+} 
