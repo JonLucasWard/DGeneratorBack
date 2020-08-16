@@ -1,6 +1,7 @@
 import { AreaControlNames } from "./Civilization";
 import {categories, FifthEMonsters} from './5eMonsters';
 import {Quests} from './Etc';
+import { massUploadValues } from "../services/UserDataService";
 
 export function GenericTableCreate(tableName:string){
     let query = `CREATE TABLE ${tableName}(
@@ -35,6 +36,21 @@ export function GenericAdminInsert(tableName:string, data){
     }
     //the values function is called which will turn the string arrays into a single string of value rows for SQL
     return query;
+}
+
+export function GenericAdminMassInsert(tableName:string, data){
+    let quests = "";
+    if(tableName === "quests"){
+        quests = " tags,";
+    }
+let query;
+if(tableName === "DnD5eMonsters"){
+    query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source, timestamp) ${MassValues(data)};`
+} else{
+    query = `INSERT INTO ${tableName}(name, explanation,${quests} timestamp) ${MassValues(data)};` //to automatically insert a series of values into Name and Explanation
+}
+//the values function is called which will turn the string arrays into a single string of value rows for SQL
+return query;
 }
 
 export function GenericTableDrop(tableName:string){
@@ -232,8 +248,40 @@ function AdminValues(data){ //we want the data to have "nulls" for timestamp com
             }
             count++;
         });
+        return valueString;
+    } 
+}
 
+function MassValues(data){
+    let valueString = `VALUES`;
+    let thisTime = new Date(); //creates timestamp of current date
+    console.log(data);
+    for(let i = 0; i<data.length; i++){
+        valueString += `(`; //starting new entry
+        let objSize = Object.keys(data[i]).length;
+        let count = 0;
+        Object.keys(data[i]).forEach((key) =>{
+            if(count < objSize-1){
+                if(key === "mainid" || key === "cr" || key === "id" || data[i][key] === null){
+                    valueString +=`${data[i][key]},`;
+                } else{
+                valueString +=`'${data[i][key]}',`;}
+            } else if(count === objSize-1 && i === data.length-1){
+                if(data[i][key] === null){
+                    valueString += `${data[i][key]}, '${thisTime}')`;
+                } else{
+                    valueString += `'${data[i][key]}', '${thisTime}')`;
+                }
+            } else {
+                if(data[i][key] === null){
+                    valueString += `${data[i][key]}, '${thisTime}')`;
+                } else{
+                valueString += `'${data[i][key]}', '${thisTime}'),`;
+                }
+            }
+            count++;
+        });
     }
-
     return valueString;
-} 
+}
+

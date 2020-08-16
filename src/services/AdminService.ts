@@ -563,3 +563,9 @@ export async function addData(tableName, data){ //user adds or edits any kind of
     await addb.query(query);
     return;
 }
+
+export async function downloadTable(table){
+    let query = `SELECT * from ${table};`;
+    let results = await db.query(query);
+    return results.rows;
+}

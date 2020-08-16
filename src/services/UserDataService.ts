@@ -17,8 +17,8 @@ export async function getTable(table, pageMin:number, pageMax:number){
 }
 
 export async function addData(table, columnData){ //user adds or edits any kind of data to database
-    console.log(columnData[0]);
     let query = Tables.GenericAdminInsert(table, columnData);
+    console.log(query);
     await addb.query(query);
     query = `SELECT id FROM ${table} ORDER BY id DESC LIMIT 1`; //get the last value added to that table, it SHOULD be the result of the last query
     let result = await addb.query(query);
@@ -30,4 +30,30 @@ export async function addData(table, columnData){ //user adds or edits any kind 
     return;
 }
 
-export async function massUploadValues(table, data){}
+export async function massUploadValues(table, data){
+    let query = Tables.GenericAdminMassInsert(table, data);
+    console.log(query);
+    await addb.query(query);
+    query = `SELECT id FROM ${table} ORDER BY id DESC LIMIT 1`; //get the last value added to that table, it SHOULD be the result of the last query
+    let result = await addb.query(query);
+    let foreignId = result.rows[0].id;
+    let thisTime = new Date(); //creates timestamp of current date
+    let values = "";
+    for(let i = 0; i < data.length; i++){
+        if(i < data.length-1){
+            values += `('${table}', ${foreignId+i-1}, '${thisTime}'), `;
+        } else{
+            values += `('${table}', ${foreignId+i-1}, '${thisTime}')`;
+        }
+    }
+    query = `INSERT into admindb(affectedTable, otherid, timestamp) VALUES${values};`
+    console.log(query);
+    await addb.query(query);
+    return;
+}
+
+export async function downloadTable(table){
+    let query = `SELECT * from ${table};`;
+    let results = await db.query(query);
+    return results.rows;
+}

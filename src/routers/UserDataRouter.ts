@@ -33,4 +33,28 @@ UserDataRouter.post('/putData/:table', async (req: any, res) =>{
     }
 });
 
+UserDataRouter.post('/massData/:table', async (req: any, res) =>{
+    try{
+        var table:string = req.params.table;
+        await UserDataService.massUploadValues(table, req.body);
+        res.json("Success");
+        return;
+    } catch(error){
+        res.status(400).send(error);
+        return;
+    }
+});
+
+UserDataRouter.get('/wholeTable/:table', async(req: any, res) =>{
+
+    try{
+        const result = await UserDataService.downloadTable(req.params.table);
+        res.json(result);
+        return;
+    } catch(error){
+        res.status(400).send(error);
+        return;
+    }
+});
+
 export default UserDataRouter;

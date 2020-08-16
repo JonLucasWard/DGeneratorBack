@@ -153,4 +153,16 @@ AdminRouter.get('/getTable/:table/:pageMin/:pageMax', async (req: any, res) => {
     }
 });
 
+AdminRouter.get('/wholeTable/:table', async(req: any, res) =>{
+
+    try{
+        const result = await AdminService.downloadTable(req.params.table);
+        res.json(result);
+        return;
+    } catch(error){
+        res.status(400).send(error);
+        return;
+    }
+});
+
 export default AdminRouter;
