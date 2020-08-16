@@ -409,6 +409,7 @@ export async function updateTest(patch: Test, target) {
 export async function addToMainDB(tableName:string, data){
     let query:string; 
 
+
     switch(tableName){ //switch based on table name, keep repeating queries until data is complete
         case 'DnD5eMonsters':
             for(let i = 0; i < data.length; i++){
@@ -517,15 +518,48 @@ export async function addToMainDB(tableName:string, data){
 }
 
 export async function getTable(table, pageMin:number, pageMax:number){ //getting a table unique to admin
-    let query = `SELECT * FROM ${table} LIMIT ${pageMax} OFFSET ${pageMin} ORDER BY id`;
+    let query = `SELECT * FROM ${table} ORDER BY id LIMIT ${pageMax} OFFSET ${pageMin};`;
     let results = await addb.query(query);
     return results.rows;
 }
-//hello
+
 export async function denyEntry(table, data){ //admin disapproved of the entry, remove it from adminDB
     let query = `DELETE FROM admindb WHERE otherid = ${data[0].id} AND affectedtable = '${table}';`;
     await addb.query(query);
     query = `DELETE FROM ${table} WHERE id = ${data[0].id};`
+    await addb.query(query);
+    return;
+}
+
+export async function addData(tableName, data){ //user adds or edits any kind of data to database
+    let query = `UPDATE ${tableName} SET `;
+    switch(tableName){
+        case "DnD5eMonsters":
+            Object.keys(data[0]).forEach((key) =>{
+                    if(key === "mainid" || key === "id" || key === "timestamp"){} //skip id, we need that last 
+                    else if(key === "cr"){ //cr can't have string apostrophes
+                        query +=`${key} = ${data[0][key]}, `;
+                    }
+                    else if(key==="source") { //explanation is our last entry
+                        query += `${key} = '${data[0][key]}' WHERE id = ${data[0].mainid};`; //last entry
+                    }
+                    else{ query +=`${key} = '${data[0][key]}', `;} //random entry "in middle"
+                });
+            break;
+        default:
+            Object.keys(data[0]).forEach((key) =>{
+                if(key === "mainid" || key === "id" || key==="timestamp"){} //skip id, mainid and timestamp, we need that last 
+                else if(key==="explanation" && tableName !== "quests") { //explanation is our last entry
+                    query += `${key} = '${data[0][key]}' WHERE id = ${data[0].id};`; //last entry
+                }
+                else if(key === "tags"){
+                    query += `${key} = '${data[0][key]}' WHERE id = ${data[0].id};`;
+                }
+                else{ query +=`${key} = '${data[0][key]}', `;} //random entry "in middle"
+            });
+        break;
+    }
+
     await addb.query(query);
     return;
 }

@@ -17,6 +17,7 @@ export async function getTable(table, pageMin:number, pageMax:number){
 }
 
 export async function addData(table, columnData){ //user adds or edits any kind of data to database
+    console.log(columnData[0]);
     let query = Tables.GenericAdminInsert(table, columnData);
     await addb.query(query);
     query = `SELECT id FROM ${table} ORDER BY id DESC LIMIT 1`; //get the last value added to that table, it SHOULD be the result of the last query

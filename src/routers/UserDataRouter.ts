@@ -24,7 +24,6 @@ UserDataRouter.get('/getTable/:table/:pageMin/:pageMax', async (req: any, res) =
 UserDataRouter.post('/putData/:table', async (req: any, res) =>{
     try{
         var table:string = req.params.table;
-        console.log("Body is " + req.body[0]);
         await UserDataService.addData(table, req.body);
         res.json("Success");
         return;

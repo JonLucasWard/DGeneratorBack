@@ -105,7 +105,7 @@ AdminRouter.get('/rebuildAdminDatabase/', async(req, res) =>{
 AdminRouter.post('/putData/:table', async (req: any, res) =>{
     try{
         var table:string = req.params.table;
-        await UserDataService.addData(table, req.body);
+        await AdminService.addData(table, req.body);
         res.json("Success");
         return;
     } catch(error){
@@ -144,7 +144,7 @@ AdminRouter.get('/getTable/:table/:pageMin/:pageMax', async (req: any, res) => {
     try {
         var pageMin:number = parseInt(req.params.pageMin, 10); //parse in the assumed number from the query string,
         var pageMax:number = parseInt(req.params.pageMax, 10);
-        const tableResult = await UserDataService.getTable(req.params.table, pageMin, pageMax);
+        const tableResult = await AdminService.getTable(req.params.table, pageMin, pageMax);
         res.json(tableResult); //give a response to the caller of the Test object
         return;
     } catch (error) { //if an error happens (IE a bad id which doesn't exist, or a non-number)
