@@ -252,29 +252,28 @@ function AdminValues(data){ //we want the data to have "nulls" for timestamp com
     } 
 }
 
-function MassValues(data){
+function MassValues(data){// for use with how the csv upload sends us data
     let valueString = `VALUES`;
     let thisTime = new Date(); //creates timestamp of current date
-    console.log(data);
-    for(let i = 0; i<data.length; i++){
+    for(let i = 0; i<data.length; i++){ //for each item in the array list, we will go over the key/values
         valueString += `(`; //starting new entry
-        let objSize = Object.keys(data[i]).length;
-        let count = 0;
-        Object.keys(data[i]).forEach((key) =>{
-            if(count < objSize-1){
+        let objSize = Object.keys(data[i]).length; //get proper count so we know when we are approaching a "final" entry
+        let count = 0; //increment as we go up to help realize when we are near an end
+        Object.keys(data[i]).forEach((key) =>{ //for each key/value in the entry
+            if(count < objSize-1){ //if it is NOT the last entry, do the following
                 if(key === "mainid" || key === "cr" || key === "id" || data[i][key] === null){
-                    valueString +=`${data[i][key]},`;
+                    valueString +=`${data[i][key]},`; //remove string identifier if it is not a string, or the value is null
                 } else{
-                valueString +=`'${data[i][key]}',`;}
-            } else if(count === objSize-1 && i === data.length-1){
+                valueString +=`'${data[i][key]}',`;} //include string identifier otherwise
+            } else if(count === objSize-1 && i === data.length-1){ //if this is the very last entry, do not include final camma
                 if(data[i][key] === null){
                     valueString += `${data[i][key]}, '${thisTime}')`;
                 } else{
                     valueString += `'${data[i][key]}', '${thisTime}')`;
                 }
-            } else {
+            } else { //otherwise it is the last value of the given object, but not the data set, include the comma
                 if(data[i][key] === null){
-                    valueString += `${data[i][key]}, '${thisTime}')`;
+                    valueString += `${data[i][key]}, '${thisTime}'),`;
                 } else{
                 valueString += `'${data[i][key]}', '${thisTime}'),`;
                 }

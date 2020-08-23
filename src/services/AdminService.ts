@@ -421,7 +421,7 @@ export async function addToMainDB(tableName:string, data){
                             if(count < objSize-1){
                                 if(key === "mainid" || key === "id" || key === "timestamp"){} //skip id, we need that last 
                                 else if(key === "cr"){ //cr can't have string apostrophes
-                                    query +=`${key} = ${data[i][key]}, `;
+                                    query +=`${key} = ${data[i][key]}, `; //each column (key) = (value)
                                 }
                                 else if(key==="source") { //explanation is our last entry
                                     query += `${key} = '${data[i][key]}' WHERE id = ${data[i].mainid};`; //last entry
@@ -430,20 +430,17 @@ export async function addToMainDB(tableName:string, data){
                             } //technically timestamp should trigger here, but we don't need anything from it
                             count++;
                         });
-                        console.log(query);
                         await db.query(query);
-                        query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}';`;
+                        query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}';`; //delete it from admin db
                         await addb.query(query);
-                        query = `DELETE FROM DnD5eMonsters WHERE id =${data[i].id};`;
+                        query = `DELETE FROM DnD5eMonsters WHERE id =${data[i].id};`; //delete it from db entirely
                         await addb.query(query);
                 } else{ //new entry
                     query = `INSERT INTO ${tableName}(name, cr, size, type, alignment, environment, source) VALUES('${data[i].name}', ${data[i].cr}, '${data[i].size}', '${data[i].type}', '${data[i].alignment}', '${data[i].environment}', '${data[i].source}');`;
                     await db.query(query); //put in new row
                     query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}';`;
-                    console.log(query);
                     await addb.query(query);
                     query = `DELETE FROM DnD5eMonsters WHERE id = ${data[i].id};`;
-                    console.log(query);
                     await addb.query(query);
                 }
             }
@@ -457,7 +454,7 @@ export async function addToMainDB(tableName:string, data){
                     Object.keys(data[i]).forEach((key) =>{
                         if(count < objSize-1){
                             if(key === "mainid" || key === "id" || key==="timestamp"){} //skip id, mainid and timestamp, we need that last 
-                            else if(key==="explanation" && tableName !== "quests") { //explanation is our last entry
+                            else if(key==="explanation" && tableName !== "quests") { //explanation is our last entry, unless it's quests then tags is our last entry
                                 query += `${key} = '${data[i][key]}' WHERE id = ${data[i].mainid};`; //last entry
                             }
                             else if(key === "tags"){
@@ -467,14 +464,13 @@ export async function addToMainDB(tableName:string, data){
                         } 
                         count++;
                     });
-                    console.log(query);
                     await db.query(query);
                     query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedTable = '${tableName}'`;
                     await addb.query(query);
                     query = `DELETE FROM ${tableName} WHERE id = ${data[i].id};`
                     await addb.query(query);
                 } else{
-                    query = `INSERT INTO ${tableName}(`;
+                    query = `INSERT INTO ${tableName}(`; //need an extra loop just for column names
                     Object.keys(data[i]).forEach((key) =>{
                         if(key === "mainid" || key ==="id" || key === "timestamp"){} //we dont need these
                         else if(key === "explanation" && tableName !== "quests"){ //end of sequence
@@ -500,11 +496,10 @@ export async function addToMainDB(tableName:string, data){
                                 query +=`'${data[i][key]}');`;
                             }
                             else{ query +=`'${data[i][key]}', `;} //random entry "in middle"
-                        } else { //last entry, probably timestamp
+                        } else { //last entry, probably timestamp so we ignore it completely
                         }
                         count++;
                     });
-                    console.log(query);
                     await db.query(query);
                     query = `DELETE FROM admindb WHERE otherid = ${data[i].id} AND affectedtable = '${tableName}';`;
                     await addb.query(query);
